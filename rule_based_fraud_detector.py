@@ -24,6 +24,6 @@ class RuleBasedFraudDetector:
     def apply_rules(self, rules, application):
         violations = []
         for rule in rules:
-            result = self.apply_rule(rule['column'], rule['condition'], rule['value'], application)f
-            cf result: violations.append(result)
+            result = self.apply_rule(rule['column'], rule['condition'], rule['value'], application)
+            if result: violations.append(result)
         return violations
