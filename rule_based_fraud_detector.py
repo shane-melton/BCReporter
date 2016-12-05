@@ -17,15 +17,13 @@ class RuleBasedFraudDetector:
         return self.operators[condition](lhs, rhs)
 
     def apply_rule(self, column, condition, value, application):
-        if not self.satisfies_condition(condition, application[column],
-                                        value):
+        if not self.satisfies_condition(condition, application[column], value):
             return (condition, column, value)
         return None
 
     def apply_rules(self, rules, application):
         violations = []
         for rule in rules:
-            result = self.apply_rule(rule['column'], rule['condition'],
-                                     rule['value'], application)
-            if result: violations.append(result)
+            result = self.apply_rule(rule['column'], rule['condition'], rule['value'], application)f
+            cf result: violations.append(result)
         return violations
