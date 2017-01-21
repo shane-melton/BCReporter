@@ -30,7 +30,7 @@ class RuleBasedFraudDetector:
 
     def _apply_cross_app_rule(self, aggregation, column, condition, value, apps, **kwargs):
         satisfies = self._satisfies_condition(
-            condition, _aggregations[aggregation](column, kwargs['key'], apps), value):
+            condition, _aggregations[aggregation](column, kwargs['key'], apps), value)
         if not satisfies:
             return (condition, aggregation, kwargs['key'], column, value)
         return None
@@ -42,7 +42,7 @@ class RuleBasedFraudDetector:
         for rule in self._single_app_rules:
             for app in enumerate(apps):
                 result = self._apply_single_app_rule(**rule, app=app[1])
-                if result: single_app_violations.append((app[0], **result))
+                if result: single_app_violations.append(app[0] + result)
 
         for rule in self._cross_app_rules:
             result = self._apply_cross_app_rule(**rule, apps=apps)
