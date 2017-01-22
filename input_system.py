@@ -1,6 +1,6 @@
 import csv
 import json
-import pymysql
+import pypyodc
 
 
 class InputSystem:
@@ -13,47 +13,48 @@ class InputSystem:
     def __init__(self):
         pass
 
-    def create_data_table(self, table_name, col_schema_name):
-        if not self.data_db.select(table_name): # List is empty; table does not exist
+    def create_data_table(self, table_name, columns, primary_key):
+        """
+        Executes CREATE TABLE table_name(<columns>,PRIMARY KEY(primary_key)) on data_db
+        :param table_name: string
+        :param columns: list
+        :param primary_key: string
+        :return: True if created successfully, False otherwise
+        """
+        if not self.data_db.select(table_name):  # List is empty; table does not exist
+            try:
+                self.data_db.create_table(table_name, columns, primary_key)
+                return True
+            except:
+                print("Error: Cannot create table " + table_name)
+                return False
+        print("Table " + table_name + " already exists")
+        return False
 
+    def get_file_column_schema(self, schema_name):
+        """
+        Execute SELECT * FROM system_db.schemas WHERE schema_name=<schema_name>
+        Finds and returns the column schema that corresponds to the input schema name
+        :param schema_name:
+        :return: { "schema_name": <string>, "schema": <json/string>, "id_field": <string> }
+        """
+        result = self.system_db.select(table="schema", where="id_field="+schema_name)
+        return result
 
-    def upload_file(self, col_schema_name, file_location, table_name):
-        self.create_data_table(table_name, col_schema_name)
-        col_schema = self.get_col_schema(col_schema_name)
-        columns = "col_schema, " + ", ".join(col_schema)
-        with open(file_location, 'rb') as csvfile:
-            self.data_db.insert()
-            data = csv.reader(csvfile, delimeter=",")
-            for row in data:
-                values = col_schema_name + ", " + ", ".join(row)
-                self.data_db.insert(table_name, columns, values)
-        self.data_db.commit()
-
-    def upload_col_schema(self, col_schema_name, col_schema):
-        columns = "schema_name, schema"
-        data = {"schema": col_schema}
-        values = "%s, %s" % (col_schema_name, json.dumps(data))
-        self.system_db.insert(self.col_schema_table, columns, values)
-        self.system_db.commit()
-
-    def upload_rule(self, col_schema_name, rule):
-        columns = "col_schema, rule"
-        values = "%s, %s" % (col_schema_name, json.dumps(rule))
-        self.system_db.insert(self.rule_table, columns, values)
-        self.system_db.commit()
-
-    def get_col_schema(self, col_schema_name):
-        return self.system_db.select(self.col_schema_table, query=col_schema_name)
-
-    def get_data_for_schema(self, col_schema_name):
-        items = list()
-        tables = self.system_db.select(self.file_col_table, query="table_name", where="col_schema=%s" % col_schema_name)
-        for table in tables:
-            items = items + self.data_db.select(table)
-        return items
-
-    def get_rules_for_schema(self, col_schema_name):
-        return self.system_db.select(self.rule_table, query="rule", where="col_schema=%s" % col_schema_name)
+    def push_file_column_schema(self, schema_name, column_schema, primary_key):
+        """
+        Execute INSERT INTO system_db.schemas(schema_name, schema, id_field) VALUES
+                                            (<schema_name>, <column_schema>, <primary_key>)
+        Execute CREATE TABLE <schema_name>(<column_schema>, PRIMARY KEY(<primary_key>))
+        Creates an entry in the system db that describes the new column schema.
+        Creates a new table in the data db that follows the new column schema.
+        :param schema_name:
+        :param column_schema:
+        :param primary_key:
+        :return:
+        """
+        self.system_db.insert("schemas", ["schema_name", "schema", "id_field"], [schema_name, column_schema, primary_key])
+        self.data_db.create_table(schema_name, column_schema, primary_key)
 
 
 class Database:
@@ -71,35 +72,51 @@ class Database:
         self.db = _db
         self.connection, self.connected = self.connect()
 
+    def __del__(self):
+        if self.connected:
+            self.connection.close()
+
     def connect(self):
         try:
-            con = pymysql.connect(host=self.host_location, user=self.username, passwd=self.password, db=self.db)
+            con = pypyodc.connect(
+                'Driver={SQL Server};'
+                'Server={};'
+                'Database={};'
+                'uid={};pwd={}'.format(self.host_location, self.db, self.username, self.password))
             return [con, True]
         except Exception as e:
             return [e, False]
 
-    def disconnect(self):
-        if self.connected:
-            self.connection.close()
-
     def insert(self, table, columns, values):
         if self.connected:
-            with self.connection.cursor() as cursor:
-                sql = "INSERT INTO %s (%s) VALUES (%s)" % (table, columns, values)
-                cursor.execute(sql)
+            cur = self.connection.cursor()
+            # EX: table="test", columns=["a", "b", "c"], values=["d", "e", "f"]
+            # sql_command = INSERT INTO test(? ? ? ) VALUES(? ? ? )
+            sql_command = "INSERT INTO " + table + "(" + ("? "*len(columns)) + ") VALUES(" + ("? "*len(values)) + ")"
+            sql_vals = columns + values
+            cur.execute(sql_command, sql_vals)
+            self.connection.commit()
 
     def select(self, table, query="*", where=""):
         if self.connected:
             items = list()
-            with self.connection.cursor() as cursor:
-                sql = "select %s from %s" % (query, table)
-                if where is not "":
-                    sql += "where %s" % where
-                cursor.execute(sql)
-                for row in cursor:
-                    items.append(row)
+            cur = self.connection.cursor()
+            sql_command = "SELECT ? FROM ?"
+            sql_vals = [query, table]
+            if where is not "":
+                sql_command += " WHERE ?"
+                sql_vals.append(where)
+            cur.execute(sql_command, sql_vals)
+            result = cur.fetchone()
+            while result:
+                items.append(result)
+                result = cur.fetchone()
             return items
 
-    def commit(self):
+    def create_table(self, table_name, columns, primary_key):
         if self.connected:
+            cur = self.conection.cursor()
+            sql_command = "CREATE TABLE ? (" + ("? "*len(columns)) + ", PRIMARY KEY(?))"
+            sql_vals = [table_name] + columns + [primary_key]
+            cur.execute(sql_command, sql_vals)
             self.connection.commit()
