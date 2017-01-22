@@ -1,4 +1,5 @@
 from flask import Flask, abort, jsonify
+import input_functions
 
 app = Flask(__name__)
 
@@ -9,8 +10,8 @@ def index():
 
 
 @app.route('/file_column_schema/<int:file_column_id>', methods=['GET'])
-def get_file_column_schema(file_column_id):
-    return "" + file_column_id
+def get_file_column_schema(schema_name):
+    return input_functions.get_file_column_schema(schema_name)
 
 
 @app.route('/file_schema_schema/', methods=['POST'])
