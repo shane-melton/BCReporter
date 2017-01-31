@@ -41,7 +41,7 @@ class InputSystem:
         result = self.system_db.select(table="schema", where="id_field="+schema_name)
         return result
 
-    def push_file_column_schema(self, schema_name, column_schema, primary_key):
+    def upload_file_column_schema(self, schema_name, column_schema, primary_key):
         """
         Execute INSERT INTO system_db.schemas(schema_name, schema, id_field) VALUES
                                             (<schema_name>, <column_schema>, <primary_key>)
@@ -53,8 +53,37 @@ class InputSystem:
         :param primary_key:
         :return:
         """
+        columns = []
+        for k,v in column_schema:
+            columns.append(k)
+            columns.append(v)
+        self.data_db.create_table(schema_name, columns, primary_key)
         self.system_db.insert("schemas", ["schema_name", "schema", "id_field"], [schema_name, column_schema, primary_key])
-        self.data_db.create_table(schema_name, column_schema, primary_key)
+
+    def upload_file(self):
+        pass
+
+    def upload_rule(self, schema, rule_name, rule_description, rule):
+        """
+
+        :param schema:
+        :param rule_name:
+        :param rule_description:
+        :param rule:
+        :return:
+        """
+        columns = ["schema", "rule_name", "rule_description", "rule"]
+        values = [schema, rule_name, rule_description, rule]
+        self.system_db.insert("rules", columns, values)
+
+    def get_rule(self, rule_name):
+        """
+
+        :param rule_name:
+        :return:
+        """
+        result = self.system_db.select("rules", "*", "rule_name={}".format(rule_name))
+        return result
 
 
 class Database:
@@ -116,7 +145,7 @@ class Database:
     def create_table(self, table_name, columns, primary_key):
         if self.connected:
             cur = self.conection.cursor()
-            sql_command = "CREATE TABLE ? (" + ("? "*len(columns)) + ", PRIMARY KEY(?))"
+            sql_command = "CREATE TABLE ? (" + ("? ? ,"*len(columns)) + " PRIMARY KEY(?))"
             sql_vals = [table_name] + columns + [primary_key]
             cur.execute(sql_command, sql_vals)
             self.connection.commit()
