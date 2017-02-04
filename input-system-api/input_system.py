@@ -54,7 +54,7 @@ class InputSystem:
         :return:
         """
         columns = []
-        for k,v in column_schema:
+        for k, v in column_schema:
             columns.append(k)
             columns.append(v)
         self.data_db.create_table(schema_name, columns, primary_key)
