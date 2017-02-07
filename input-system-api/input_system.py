@@ -1,35 +1,20 @@
-import csv
-import json
-import pypyodc
+import pyodbc
 
 
 class InputSystem:
     data_db = Database(_username="admin", _password="password", _host_location="localhost", _db="data")
     system_db = Database(_username="admin", _password="password", _host_location="localhost", _db="system")
-    col_schema_table = "col_schemas"
+    col_schema_table = "schemas"
     rule_table = "rules"
-    file_col_table = "file_column"
+    # Will use only [1:] for inserts to skip "id"
+    col_schema_columns = ["id", "schema__name", "schema__", "id_field"]
+    rule_columns = ["id", "schema__", "rule_name", "rule_description", "rule__"]
 
-    def __init__(self):
-        pass
-
-    def create_data_table(self, table_name, columns, primary_key):
-        """
-        Executes CREATE TABLE table_name(<columns>,PRIMARY KEY(primary_key)) on data_db
-        :param table_name: string
-        :param columns: list
-        :param primary_key: string
-        :return: True if created successfully, False otherwise
-        """
-        if not self.data_db.select(table_name):  # List is empty; table does not exist
-            try:
-                self.data_db.create_table(table_name, columns, primary_key)
-                return True
-            except:
-                print("Error: Cannot create table " + table_name)
-                return False
-        print("Table " + table_name + " already exists")
-        return False
+    def __init__(self, data_db_login, system_db_login):
+        self.data_db = Database(_username=data_db_login["username"], _password=data_db_login["password"],
+                                _host_location=data_db_login["host"], _db=data_db_login["db_name"])
+        self.system_db = Database(_username=system_db_login["username"], _password=system_db_login["password"],
+                                  _host_location=system_db_login["host"], _db=system_db_login["db_name"])
 
     def get_file_column_schema(self, schema_name):
         """
@@ -38,7 +23,7 @@ class InputSystem:
         :param schema_name:
         :return: { "schema_name": <string>, "schema": <json/string>, "id_field": <string> }
         """
-        result = self.system_db.select(table="schema", where="id_field="+schema_name)
+        result = self.system_db.select(table=self.col_schema_table, where="id_field="+schema_name)
         return result
 
     def upload_file_column_schema(self, schema_name, column_schema, primary_key):
@@ -53,15 +38,26 @@ class InputSystem:
         :param primary_key:
         :return:
         """
-        columns = []
+        columns = ["file_name", "TEXT"]
         for k, v in column_schema:
             columns.append(k)
             columns.append(v)
         self.data_db.create_table(schema_name, columns, primary_key)
-        self.system_db.insert("schemas", ["schema_name", "schema", "id_field"], [schema_name, column_schema, primary_key])
+        self.system_db.insert(self.col_schema_table, self.col_schema_columns[1:], [schema_name, column_schema, primary_key])
 
-    def upload_file(self):
-        pass
+    def upload_file_date(self, file_name, file_data, file_schema_name, file_schema):
+        """
+
+        :param file_name: Name of the file that this data came from
+        :param file_data: list of dictionaries, with dictionary keys matching with the keys in file_schema
+        :param file_schema_name: Name of the file schema
+        :param file_schema: ordered dictionary with dictionary keys matching the key structure of the internal db for this file_schema
+        :return:
+        """
+        cols = ["file_name"] + file_schema.keys()
+        for row in file_data:
+            structured_row = [file_name] + [row[key] for key in file_schema.keys()]
+            self.data_db.insert(table=file_schema_name, columns=cols, values=structured_row)
 
     def upload_rule(self, schema, rule_name, rule_description, rule):
         """
@@ -72,9 +68,8 @@ class InputSystem:
         :param rule:
         :return:
         """
-        columns = ["schema", "rule_name", "rule_description", "rule"]
         values = [schema, rule_name, rule_description, rule]
-        self.system_db.insert("rules", columns, values)
+        self.system_db.insert(self.rule_table, self.rule_columns[1:], values)
 
     def get_rule(self, rule_name):
         """
@@ -82,7 +77,7 @@ class InputSystem:
         :param rule_name:
         :return:
         """
-        result = self.system_db.select("rules", "*", "rule_name={}".format(rule_name))
+        result = self.system_db.select(self.rule_table, "*", "rule_name={}".format(rule_name))
         return result
 
 
@@ -107,7 +102,7 @@ class Database:
 
     def connect(self):
         try:
-            con = pypyodc.connect(
+            con = pyodbc.connect(
                 'Driver={SQL Server};'
                 'Server={};'
                 'Database={};'
