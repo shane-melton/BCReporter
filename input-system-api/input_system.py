@@ -1,6 +1,71 @@
 import pyodbc
 
 
+class Database:
+    username = ""
+    password = ""
+    host_location = ""
+    db = ""
+    connected = False
+    connection = object
+
+    def __init__(self, _username, _password, _host_location, _db):
+        self.username = _username
+        self.password = _password
+        self.host_location = _host_location
+        self.db = _db
+        self.connection, self.connected = self.connect()
+
+    def __del__(self):
+        if self.connected:
+            self.connection.close()
+
+    def connect(self):
+        try:
+            con = pyodbc.connect(
+                'Driver={SQL Server};'
+                'Server={};'
+                'Database={};'
+                'uid={};pwd={}'.format(self.host_location, self.db, self.username, self.password))
+            return [con, True]
+        except Exception as e:
+            return [e, False]
+
+    def insert(self, table, columns, values):
+        if self.connected:
+            cur = self.connection.cursor()
+            # EX: table="test", columns=["a", "b", "c"], values=["d", "e", "f"]
+            # sql_command = INSERT INTO test(? ? ? ) VALUES(? ? ? )
+            sql_command = "INSERT INTO " + table + "(" + ("? "*len(columns)) + ") VALUES(" + ("? "*len(values)) + ")"
+            sql_vals = columns + values
+            cur.execute(sql_command, sql_vals)
+            self.connection.commit()
+
+    def select(self, table, query="*", where=""):
+        if self.connected:
+            items = list()
+            cur = self.connection.cursor()
+            sql_command = "SELECT ? FROM ?"
+            sql_vals = [query, table]
+            if where is not "":
+                sql_command += " WHERE ?"
+                sql_vals.append(where)
+            cur.execute(sql_command, sql_vals)
+            result = cur.fetchone()
+            while result:
+                items.append(result)
+                result = cur.fetchone()
+            return items
+
+    def create_table(self, table_name, columns, primary_key):
+        if self.connected:
+            cur = self.conection.cursor()
+            sql_command = "CREATE TABLE ? (" + ("? ? ,"*len(columns)) + " PRIMARY KEY(?))"
+            sql_vals = [table_name] + columns + [primary_key]
+            cur.execute(sql_command, sql_vals)
+            self.connection.commit()
+
+
 class InputSystem:
     data_db = Database(_username="admin", _password="password", _host_location="localhost", _db="data")
     system_db = Database(_username="admin", _password="password", _host_location="localhost", _db="system")
@@ -79,68 +144,3 @@ class InputSystem:
         """
         result = self.system_db.select(self.rule_table, "*", "rule_name={}".format(rule_name))
         return result
-
-
-class Database:
-    username = ""
-    password = ""
-    host_location = ""
-    db = ""
-    connected = False
-    connection = object
-
-    def __init__(self, _username, _password, _host_location, _db):
-        self.username = _username
-        self.password = _password
-        self.host_location = _host_location
-        self.db = _db
-        self.connection, self.connected = self.connect()
-
-    def __del__(self):
-        if self.connected:
-            self.connection.close()
-
-    def connect(self):
-        try:
-            con = pyodbc.connect(
-                'Driver={SQL Server};'
-                'Server={};'
-                'Database={};'
-                'uid={};pwd={}'.format(self.host_location, self.db, self.username, self.password))
-            return [con, True]
-        except Exception as e:
-            return [e, False]
-
-    def insert(self, table, columns, values):
-        if self.connected:
-            cur = self.connection.cursor()
-            # EX: table="test", columns=["a", "b", "c"], values=["d", "e", "f"]
-            # sql_command = INSERT INTO test(? ? ? ) VALUES(? ? ? )
-            sql_command = "INSERT INTO " + table + "(" + ("? "*len(columns)) + ") VALUES(" + ("? "*len(values)) + ")"
-            sql_vals = columns + values
-            cur.execute(sql_command, sql_vals)
-            self.connection.commit()
-
-    def select(self, table, query="*", where=""):
-        if self.connected:
-            items = list()
-            cur = self.connection.cursor()
-            sql_command = "SELECT ? FROM ?"
-            sql_vals = [query, table]
-            if where is not "":
-                sql_command += " WHERE ?"
-                sql_vals.append(where)
-            cur.execute(sql_command, sql_vals)
-            result = cur.fetchone()
-            while result:
-                items.append(result)
-                result = cur.fetchone()
-            return items
-
-    def create_table(self, table_name, columns, primary_key):
-        if self.connected:
-            cur = self.conection.cursor()
-            sql_command = "CREATE TABLE ? (" + ("? ? ,"*len(columns)) + " PRIMARY KEY(?))"
-            sql_vals = [table_name] + columns + [primary_key]
-            cur.execute(sql_command, sql_vals)
-            self.connection.commit()
