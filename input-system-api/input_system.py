@@ -59,10 +59,16 @@ class Database:
 
     def create_table(self, table_name, columns, primary_key):
         if self.connected:
-            cur = self.conection.cursor()
-            sql_command = "CREATE TABLE ? (" + ("? ? ,"*len(columns)) + " PRIMARY KEY(?))"
+            cur = self.connection.cursor()
+            sql_command = "CREATE TABLE ? (" + ("? ?,"*int(len(columns)/2)) + " PRIMARY KEY(?))"
             sql_vals = [table_name] + columns + [primary_key]
-            cur.execute(sql_command, sql_vals)
+            try:
+                cur.execute(sql_command, sql_vals)
+            except:
+                print("Command:")
+                print(sql_command)
+                print("Vals:")
+                print(sql_vals)
             self.connection.commit()
 
 
@@ -105,8 +111,8 @@ class InputSystem:
         """
         columns = ["file_name", "TEXT"]
         for k, v in column_schema:
-            columns.append(k)
-            columns.append(v)
+            columns.append(str(k))
+            columns.append(str(v))
         self.data_db.create_table(schema_name, columns, primary_key)
         self.system_db.insert(self.col_schema_table, self.col_schema_columns[1:], [schema_name, column_schema, primary_key])
 
