@@ -23,7 +23,7 @@ class Database:
     def connect(self):
         try:
             con = pyodbc.connect(
-                'Driver={SQL Server};'
+                'Driver={{SQL Server}};'
                 'Server={};'
                 'Database={};'
                 'uid={};pwd={}'.format(self.host_location, self.db, self.username, self.password))
