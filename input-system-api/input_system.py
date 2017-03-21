@@ -1,4 +1,6 @@
 import pyodbc
+import json
+import sys
 
 
 class Database:
@@ -21,40 +23,48 @@ class Database:
             self.connection.close()
 
     def connect(self):
-        try:
-            con = pyodbc.connect(
-                'Driver={{SQL Server}};'
-                'Server={};'
-                'Database={};'
-                'uid={};pwd={}'.format(self.host_location, self.db, self.username, self.password))
-            return [con, True]
-        except Exception as e:
-            return [e, False]
+        con = pyodbc.connect(
+            'Driver={{ODBC Driver 13 for SQL Server}};'
+            'Server={};'
+            'Database={};'
+            'uid={};pwd={}'.format(self.host_location, self.db, self.username, self.password))
+        return [con, True]
 
     def insert(self, table, columns, values):
         if self.connected:
             cur = self.connection.cursor()
             # EX: table="test", columns=["a", "b", "c"], values=["d", "e", "f"]
             # sql_command = INSERT INTO test(? ? ? ) VALUES(? ? ? )
-            sql_command = "INSERT INTO " + table + "(" + ("? "*len(columns)) + ") VALUES(" + ("? "*len(values)) + ")"
-            sql_vals = columns + values
+            sql_command = "INSERT INTO " + table + "(" + columns[0]
+            for col in columns[1:]:
+                sql_command += ", " + col
+            sql_command += ") VALUES(?" + ", ?"*(len(values)-1) + ")"
+
+            sql_vals = values
+            print(sql_command, file=sys.stderr)
+            print(sql_vals, file=sys.stderr)
             cur.execute(sql_command, sql_vals)
             self.connection.commit()
 
-    def select(self, table, query="*", where=""):
+    def select(self, table, query="*", lhs="", rhs=""):
         if self.connected:
             items = list()
             cur = self.connection.cursor()
-            sql_command = "SELECT ? FROM ?"
-            sql_vals = [query, table]
-            if where is not "":
-                sql_command += " WHERE ?"
-                sql_vals.append(where)
+            sql_command = "SELECT " + query + " FROM " + table
+            sql_vals = []
+            if lhs is not "":
+                sql_command += " WHERE " + lhs + " = ?"
+                sql_vals.append(rhs)
+            print(sql_command, file=sys.stderr)
+            print(sql_vals, file=sys.stderr)
             cur.execute(sql_command, sql_vals)
-            result = cur.fetchone()
-            while result:
-                items.append(result)
-                result = cur.fetchone()
+            for res in cur.fetchall():
+                items.append(res)
+            # result = cur.fetchone()
+            # while result:
+            #     print(result, file=sys.stderr)
+            #     items.append(result)
+            #     result = cur.fetchone()
             return items
 
     def create_table(self, table_name, columns, primary_key):
@@ -73,8 +83,8 @@ class Database:
 
 
 class InputSystem:
-    data_db = Database(_username="admin", _password="password", _host_location="localhost", _db="data")
-    system_db = Database(_username="admin", _password="password", _host_location="localhost", _db="system")
+    data_db = Database(_username="root", _password="password", _host_location="localhost\SQLEXPRESS", _db="data")
+    system_db = Database(_username="root", _password="password", _host_location="localhost\SQLEXPRESS", _db="system")
     col_schema_table = "schemas"
     rule_table = "rules"
     # Will use only [1:] for inserts to skip "id"
@@ -87,6 +97,9 @@ class InputSystem:
         self.system_db = Database(_username=system_db_login["username"], _password=system_db_login["password"],
                                   _host_location=system_db_login["host"], _db=system_db_login["db_name"])
 
+    def __init__(self):
+        pass
+
     def get_file_column_schema(self, schema_name):
         """
         Execute SELECT * FROM system_db.schemas WHERE schema_name=<schema_name>
@@ -94,7 +107,7 @@ class InputSystem:
         :param schema_name:
         :return: { "schema_name": <string>, "schema": <json/string>, "id_field": <string> }
         """
-        result = self.system_db.select(table=self.col_schema_table, where="id_field="+schema_name)
+        result = self.system_db.select(table=self.col_schema_table, lhs="schema__name", rhs=schema_name)
         return result
 
     def upload_file_column_schema(self, schema_name, column_schema, primary_key):
@@ -110,13 +123,13 @@ class InputSystem:
         :return:
         """
         columns = ["file_name", "TEXT"]
-        for k, v in column_schema:
+        for k, v in column_schema.items():
             columns.append(str(k))
             columns.append(str(v))
         self.data_db.create_table(schema_name, columns, primary_key)
-        self.system_db.insert(self.col_schema_table, self.col_schema_columns[1:], [schema_name, column_schema, primary_key])
+        self.system_db.insert(self.col_schema_table, self.col_schema_columns[1:], [schema_name, json.dumps(column_schema), primary_key])
 
-    def upload_file_date(self, file_name, file_data, file_schema_name, file_schema):
+    def upload_file_data(self, file_name, file_data, file_schema_name, file_schema):
         """
 
         :param file_name: Name of the file that this data came from
