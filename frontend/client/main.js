@@ -20,10 +20,14 @@ import {Meteor} from 'meteor/meteor';
  */
 
 import 'angular-material/angular-material.css';
+import 'angular-material-data-table';
+import 'angular-material-data-table/dist/md-data-table.min.css';
 // import 'material-design-icons/iconfont/MaterialIcons-Regular.svg';
 
 //Pages
 import {name as UserDashboard} from '../imports/ui/pages/userDashboard/userDashboard';
+import {name as FileSchemas} from '../imports/ui/pages/fileSchemas/fileSchemas';
+import {name as Rules} from '../imports/ui/pages/rules/rules';
 
 //Components
 import {name as Navigation} from '../imports/ui/components/navigation/navigation';
@@ -32,21 +36,28 @@ import {name as Navigation} from '../imports/ui/components/navigation/navigation
 
 //API
 
+import './main.scss';
+
 let appName = "bcreporter";
 
-let dependencies = [appName, angularMeteor, ngMaterial, ngAnimate, ngAria, uiRouter,
-                    UserDashboard,
+let dependencies = [appName, angularMeteor, ngMaterial, ngAnimate, ngAria, uiRouter, 'md.data.table',
+                    UserDashboard, FileSchemas, Rules,
                     Navigation];
 
-function config($locationProvider) {
+function config($locationProvider, $urlRouterProvider) {
     'ngInject';
 
     $locationProvider.html5Mode(true);
+
+    $urlRouterProvider.otherwise('/dash');
 
 }
 
 function run() {
     'ngInject';
+
+
+
 }
 
 function onReady() {

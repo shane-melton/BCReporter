@@ -1,9 +1,5 @@
 /**
- * Created by Shane Melton on 2/10/17.
- *
- * User dashboard that is the main landing page for logged in users. It will provide
- * realtime information regarding the system, rules, alerts, etc.
- *
+ * Created by shane on 3/23/17.
  */
 
 /**
@@ -28,11 +24,15 @@ import uiRouter from 'angular-ui-router';
 /**
  * Page Imports
  */
+import sideNavTemplate from '../../templates/default.sidenav.html';
 
-import sideNavTemplate from '../../templates/default.sidenav.html'
+import listTemplate from './list/rules.list.html';
+import ListController from './list/rules.list';
 
-import template from './userDashboard.html';
-import './userDashboard.scss';
+import editTemplate from './edit/rules.edit.html';
+import EditController from './edit/rules.edit';
+
+import './rules.scss';
 
 /**
  * Dependencies Array from imports
@@ -44,30 +44,22 @@ let dependencies = [angularMeteor, uiRouter];
  * The Page's component class. Instantiates any watchers, subscribes, and scope
  * of the page. Provides any methods that need to be accessed by the view.
  */
-class UserDashboard {
+class RulesController {
 
-    constructor($reactive, $scope, $mdSidenav) {
+    constructor($reactive, $scope) {
         'ngInject';
 
-        this.$mdSidenav = $mdSidenav;
+    }
 
-    }
-    toggleUserList() {
-        this.$mdSidenav('left').toggle();
-    }
 }
 
+
+
 //The angular name for this component
-export const name = "userDashboard";
+export const name = "rules";
 
 //Export the actual component in its own module
-export default angular.module(name, dependencies)
-    .component(name, {
-        template,
-        controller: UserDashboard,
-        controllerAs: name
-    })
-    .config(config);
+export default angular.module(name, dependencies).config(config);
 
 /**
  * Config function that will configure the state and URL route for this page
@@ -77,11 +69,14 @@ function config($stateProvider) {
     'ngInject';
 
     $stateProvider
-        .state('userDashboard', {
-            url: '/dash',
+        .state('rules', {
+            abstract: true,
+            url: '/rules',
             views: {
                 'main': {
-                    template: '<user-dashboard></user-dashboard>'
+                    template: '<ui-view/>',
+                    controller: RulesController,
+                    controllerAs: '$page'
                 },
                 'sidenav': {
                     template: sideNavTemplate,
@@ -92,6 +87,25 @@ function config($stateProvider) {
                     }
                 }
             }
+        })
+        .state('rules.list', {
+            url: '/list',
+            template: listTemplate,
+            controller: ListController,
+            controllerAs: '$ctrl'
+        })
+        .state('rules.edit', {
+            url: '/edit/:id',
+            template: editTemplate,
+            controller: EditController,
+            controllerAs: '$ctrl',
+            params: {
+                id: {
+                    value: null,
+                    squash: true
+                }
+            }
         });
-
 }
+
+

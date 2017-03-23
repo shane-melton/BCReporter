@@ -1,0 +1,24 @@
+<md-toolbar layout="row" class="md-hue-3">
+    <div class="md-toolbar-tools">
+        <span>Current File Schemas {{$tmpCtrl.parentThing}}</span>
+    </div>
+</md-toolbar>
+<md-content>
+    <md-list flex>
+        <md-list-item class="md-2-line" ng-repeat="schema in $ctrl.fileSchemas" ng-click="null">
+            <div class="md-list-item-text" layout="column" >
+                <h3>{{schema.name}}</h3>
+                <p>{{schema.description}}</p>
+            </div>
+            <md-icon class="md-secondary" ng-click="$ctrl.edit(schema)" md-font-library="material-icons" aria-label="edit">edit</md-icon>
+            <md-icon class="md-secondary" ng-click="$ctrl.remove(schema, $event)" md-font-library="material-icons" aria-label="delete">delete</md-icon>
+        </md-list-item>
+    </md-list>
+</md-content>
+<md-button ui-sref="fileSchemas.edit" class="md-fab md-fab-bottom-right">
+    <md-tooltip md-direction="top">Create New</md-tooltip>
+    <md-icon md-font-library="material-icons" aria-label="Create New">add</md-icon>
+</md-button>
+
+
+

@@ -1,0 +1,29 @@
+<md-toolbar class="">
+
+</md-toolbar>
+<md-content>
+    <md-list ng-click="closeSideNav()">
+        <md-subheader class="md-no-sticky">Navigation</md-subheader>
+
+        <md-list-item ui-sref="userDashboard">
+            <md-icon md-font-library="material-icons">dashboard</md-icon>
+            <p>Dashboard</p>
+        </md-list-item>
+        <md-list-item ui-sref="fileSchemas.list">
+            <md-icon md-font-library="material-icons">description</md-icon>
+            <p>File Schemas</p>
+        </md-list-item>
+        <md-list-item ui-sref="rules.list">
+            <md-icon md-font-library="material-icons">list</md-icon>
+            <p>Rules</p>
+        </md-list-item>
+
+        <md-divider></md-divider>
+        <md-subheader class="md-no-sticky">Account</md-subheader>
+
+        <md-list-item ng-click="null">
+            <md-icon md-font-library="material-icons">settings</md-icon>
+            <p>Account Settings</p>
+        </md-list-item>
+    </md-list>
+</md-content>
