@@ -1,57 +1,64 @@
-<md-content layout="row" layout-align="center">
-    <div flex-gt-sm="90" flex-gt-md="80">
-        <h2 class="md-title inset">Active Rules</h2>
-        <md-card>
-            <md-list>
-                <md-list-item class="md-3-line">
-                    <div class="md-list-item-text">
-                        <h3>Rule One</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deserunt doloremque esse maiores sint tenetur</p>
-                        <md-icon class="md-secondary" ng-click="$ctrl.edit(schema)" md-font-library="material-icons" aria-label="edit">edit</md-icon>
-                        <md-icon class="md-secondary" ng-click="$ctrl.remove(schema, $event)" md-font-library="material-icons" aria-label="delete">delete</md-icon>
-                    </div>
-                    <md-divider ng-if="!$last"></md-divider>
-                </md-list-item>
-                <md-list-item class="md-3-line">
-                    <div class="md-list-item-text">
-                        <h3>Rule Two</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, repellendus?</p>
-                        <md-icon class="md-secondary" ng-click="$ctrl.edit(schema)" md-font-library="material-icons" aria-label="edit">edit</md-icon>
-                        <md-icon class="md-secondary" ng-click="$ctrl.remove(schema, $event)" md-font-library="material-icons" aria-label="delete">delete</md-icon>
-                    </div>
-                    <md-divider ng-if="!$last"></md-divider>
-                </md-list-item>
-                <md-list-item class="md-3-line">
-                    <div class="md-list-item-text">
-                        <h3>Rule Three</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, repellendus?</p>
-                        <md-icon class="md-secondary" ng-click="$ctrl.edit(schema)" md-font-library="material-icons" aria-label="edit">edit</md-icon>
-                        <md-icon class="md-secondary" ng-click="$ctrl.remove(schema, $event)" md-font-library="material-icons" aria-label="delete">delete</md-icon>
-                    </div>
-                    <!--<md-divider md-inset hide-sm ng-if="!$last"></md-divider>-->
-                    <!--<md-divider hide-gt-sm ng-if="!$last"></md-divider>-->
-                </md-list-item>
-            </md-list>
-        </md-card>
+<div layout="row" layout-fill flex layout-align="center">
+    <div flex-gt-md="30" layout-fill>
+        <div class="padded" layout-fill md-whiteframe="1" flex layout>
+            <span>md-whiteframe="1"</span>
+        </div>
     </div>
-</md-content>
-
-<md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="search">
-
-    <md-toolbar class="md-theme-light">
-        <h1 class="md-toolbar-tools">Sidenav Right</h1>
-    </md-toolbar>
-    <md-content layout-padding>
-        <form>
-            <md-input-container>
-                <label for="testInput">Test input</label>
-                <input type="text" id="testInput"
-                       ng-model="data" md-autofocus>
-            </md-input-container>
-        </form>
-        <md-button ng-click="close()" class="md-primary">
-            Close Sidenav Right
-        </md-button>
+    <md-content flex-gt-md="70" flex="100" layout="row" layout-align="center">
+        <!--<div flex-gt-sm="90" flex-gt-md="80">-->
+            <!--<h2 class="md-title inset">Active Rules</h2>-->
+            <!--<md-card>-->
+                <!--<md-list>-->
+                    <!--<md-list-item class="md-3-line">-->
+                        <!--<div class="md-list-item-text">-->
+                            <!--<h3>Rule One</h3>-->
+                            <!--<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deserunt doloremque esse maiores sint tenetur</p>-->
+                            <!--<md-icon class="md-secondary" ng-click="$ctrl.edit(schema)" md-font-library="material-icons" aria-label="edit">edit</md-icon>-->
+                            <!--<md-icon class="md-secondary" ng-click="$ctrl.remove(schema, $event)" md-font-library="material-icons" aria-label="delete">delete</md-icon>-->
+                        <!--</div>-->
+                        <!--<md-divider ng-if="!$last"></md-divider>-->
+                    <!--</md-list-item>-->
+                    <!--<md-list-item class="md-3-line">-->
+                        <!--<div class="md-list-item-text">-->
+                            <!--<h3>Rule Two</h3>-->
+                            <!--<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, repellendus?</p>-->
+                            <!--<md-icon class="md-secondary" ng-click="$ctrl.edit(schema)" md-font-library="material-icons" aria-label="edit">edit</md-icon>-->
+                            <!--<md-icon class="md-secondary" ng-click="$ctrl.remove(schema, $event)" md-font-library="material-icons" aria-label="delete">delete</md-icon>-->
+                        <!--</div>-->
+                        <!--<md-divider ng-if="!$last"></md-divider>-->
+                    <!--</md-list-item>-->
+                    <!--<md-list-item class="md-3-line">-->
+                        <!--<div class="md-list-item-text">-->
+                            <!--<h3>Rule Three</h3>-->
+                            <!--<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ea, repellendus?</p>-->
+                            <!--<md-icon class="md-secondary" ng-click="$ctrl.edit(schema)" md-font-library="material-icons" aria-label="edit">edit</md-icon>-->
+                            <!--<md-icon class="md-secondary" ng-click="$ctrl.remove(schema, $event)" md-font-library="material-icons" aria-label="delete">delete</md-icon>-->
+                        <!--</div>-->
+                        <!--&lt;!&ndash;<md-divider md-inset hide-sm ng-if="!$last"></md-divider>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<md-divider hide-gt-sm ng-if="!$last"></md-divider>&ndash;&gt;-->
+                    <!--</md-list-item>-->
+                <!--</md-list>-->
+            <!--</md-card>-->
+        <!--</div>-->
     </md-content>
+</div>
 
-</md-sidenav>
+<!--<md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="search">-->
+
+    <!--<md-toolbar class="md-theme-light">-->
+        <!--<h1 class="md-toolbar-tools">Sidenav Right</h1>-->
+    <!--</md-toolbar>-->
+    <!--<md-content layout-padding>-->
+        <!--<form>-->
+            <!--<md-input-container>-->
+                <!--<label for="testInput">Test input</label>-->
+                <!--<input type="text" id="testInput"-->
+                       <!--ng-model="data" md-autofocus>-->
+            <!--</md-input-container>-->
+        <!--</form>-->
+        <!--<md-button ng-click="close()" class="md-primary">-->
+            <!--Close Sidenav Right-->
+        <!--</md-button>-->
+    <!--</md-content>-->
+
+<!--</md-sidenav>-->
