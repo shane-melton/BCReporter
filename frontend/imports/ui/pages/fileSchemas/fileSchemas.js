@@ -51,11 +51,7 @@ class FileSchemasController {
 
     constructor($reactive, $scope) {
         'ngInject';
-
         // $reactive(this).attach($scope);
-
-
-
     }
 
 }
