@@ -15,12 +15,25 @@ export default class ListController {
 
         $reactive(this).attach($scope);
 
+        this.search = {
+            text: "",
+            user: "",
+            minAlerts: 0,
+            maxAlerts: 0,
+            schema: null
+        };
+
+        this.fileSchemas = [
+            {
+                name: "Loan Application"
+            },
+            {
+                name: "Credit Card Application"
+            },
+            {
+                name: "Car Loan Application"
+            }
+        ];
+
     }
-
-    openSearch() {
-        this.$mdSidenav('search').toggle();
-    }
-
-
-
 }

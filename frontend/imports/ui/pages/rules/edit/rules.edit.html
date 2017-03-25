@@ -1,1 +1,52 @@
-Test
+<div layout="row" layout-align="center">
+    <div flex-gt-md="80" flex="100" layout="row" layout-sm="column" layout-xs="column">
+        <div flex-sm flex-xs flex-gt-sm="35">
+            <md-card flex>
+                <md-card-content>
+                    <h2>Rule Details</h2>
+                    <div layout="row">
+                        <md-input-container flex>
+                            <label>Rule Name</label>
+                            <input type="text" ng-model="$ctrl.search.text" required>
+                        </md-input-container>
+                    </div>
+                    <div layout="row">
+                        <md-input-container flex class="md-block">
+                            <label>Description</label>
+                            <textarea ng-model="user.biography" md-maxlength="150" rows="2" md-select-on-focus></textarea>
+                        </md-input-container>
+                    </div>
+                    <div layout="row">
+                        <md-input-container flex>
+                            <label>File Schema</label>
+                            <md-select ng-model="$ctrl.fileSchema" required ng-disabled="$ctrl.hasConditions()">
+                                <md-option ng-repeat="schema in $ctrl.fileSchemas" ng-value="schema.name">
+                                    {{schema.name}}
+                                </md-option>
+                            </md-select>
+                            <md-tooltip md-direction="top" ng-if="$ctrl.hasConditions()">Rule conditions must be cleared!</md-tooltip>
+                        </md-input-container>
+                    </div>
+                </md-card-content>
+                <md-card-actions layout="row" layout-align="end center">
+                    <md-button>Clear</md-button>
+                    <md-button class="md-accent md-raised">Save Rule</md-button>
+                </md-card-actions>
+            </md-card>
+        </div>
+        <div flex>
+            <md-card flex>
+                <md-card-content>
+                    <h2>Rule Conditions</h2>
+                    <p>Card content</p>
+                </md-card-content>
+                <md-card-actions layout="row" layout-align="end center">
+                    <md-button>Clear</md-button>
+                    <md-button class="md-primary">
+                        Add Condition
+                    </md-button>
+                </md-card-actions>
+            </md-card>
+        </divflex>
+    </div>
+</div>
