@@ -1,5 +1,5 @@
     <div layout="row" layout-fill flex layout-align="center">
-    <md-content flex-gt-sm="30" hide-sm hide-xs layout-align="center" layout="row">
+    <md-content flex-gt-sm="30" hide-sm hide-xs layout-align="end" layout="row">
         <div flex="90">
             <h2 class="md-title inset">Search Tools</h2>
             <md-card>
@@ -33,7 +33,7 @@
                                 <label>File Schema</label>
                                 <md-select ng-model="$ctrl.fileSchema">
                                     <md-option ng-value="any"><em>Any</em></md-option>
-                                    <md-option ng-repeat="schema in $ctrl.fileSchemas" ng-value="schema.name" ng-disabled="$index === 1">
+                                    <md-option ng-repeat="schema in $ctrl.fileSchemas" ng-value="schema.name">
                                         {{schema.name}}
                                     </md-option>
                                 </md-select>

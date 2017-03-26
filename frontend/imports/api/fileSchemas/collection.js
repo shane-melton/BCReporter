@@ -12,13 +12,15 @@ if(Meteor.isServer) {
     });
 }
 
+export const DATA_TYPES = ["Integer", "String", "Boolean", "Float"];
+
 export const ColumnSchema = new SimpleSchema({
     name: {
         type: String
     },
     type: {
         type: String,
-        allowedValues: ["Integer", "String", "Boolean", "Float"]
+        allowedValues: DATA_TYPES
     },
     unique: {
         type: Boolean,

@@ -21,6 +21,8 @@ import uiRouter from 'angular-ui-router';
  * User Interface Imports
  */
 
+import {name as ConditionEditor} from '../../components/conditionEditor/conditionEditor';
+
 /**
  * Page Imports
  */
@@ -38,7 +40,7 @@ import './rules.scss';
  * Dependencies Array from imports
  */
 
-let dependencies = [angularMeteor, uiRouter];
+let dependencies = [angularMeteor, uiRouter, ConditionEditor];
 
 /**
  * The Page's component class. Instantiates any watchers, subscribes, and scope

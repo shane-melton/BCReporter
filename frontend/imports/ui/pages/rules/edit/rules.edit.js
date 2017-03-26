@@ -30,6 +30,20 @@ export default class EditController {
         this.fileSchema = this.fileSchemas[0].name;
 
         this.conditions = [];
+        this.fields = ['id', 'lastName', 'firstName'];
+
+        this.comparison = '';
+
+        this.comparisons = [{
+            desc: 'less than',
+            val: '<'
+        }, {
+            desc: 'equal to',
+            val: '='
+        }, {
+            desc: 'greater than',
+            val: '>'
+        }];
 
     }
 
@@ -39,6 +53,20 @@ export default class EditController {
 
     hasFileSchema() {
         return !(_.isUndefined(this.fileSchema) || _.isNull(this.fileSchema));
+    }
+
+    clearAll() {
+        this.conditions = [];
+    }
+
+    deleteSelected() {
+        this.conditions = _.filter(this.conditions, (cond) => {
+            return !cond.checked;
+        });
+    }
+
+    addCondition() {
+        this.conditions.push({});
     }
 
 }
