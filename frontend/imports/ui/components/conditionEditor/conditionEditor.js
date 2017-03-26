@@ -16,8 +16,7 @@ import angularMeteor from 'angular-meteor';
  * API Imports
  */
 
-// import {Rules} from '../../../api/rules/';
-import {DATA_TYPES} from '../../../api/fileSchemas';
+import {DATA_TYPES, FileSchemas} from '../../../api/fileSchemas';
 
 /**
  * User Interface Imports
@@ -47,6 +46,14 @@ class ConditionEditor {
         if(_.isUndefined(this.condition) || _.isNull(this.condition)) {
             this.condition = {};
         }
+
+        if(_.isUndefined(this.schema) || _.isNull(this.schema)) {
+            this.schema = {
+                columns: []
+            }
+        }
+
+
 
         this.fields = [{
             name: 'id',
@@ -78,18 +85,22 @@ class ConditionEditor {
 
     fieldChange() {
         this.condition.value = null;
-        if(this.condition.field.type == "Boolean") {
-            this.condition.comparison = "=";
+        if(this.getField(this.condition.fieldName).type == "Boolean") {
+            this.condition.compOp = "=";
         }
         else {
-            this.condition.comparison = null;
+            this.condition.compOp = null;
         }
     }
 
+    getField(fieldName) {
+        return _.findWhere(this.schema.columns, {name: fieldName});
+    }
+
     isBoolean() {
-        if(_.isUndefined(this.condition) || _.isUndefined(this.condition.field))
+        if(_.isUndefined(this.condition) || _.isUndefined(this.condition.fieldName))
             return false;
-        return this.condition.field.type == "Boolean";
+        return this.getField(this.condition.fieldName).type == "Boolean";
     }
 
 
@@ -105,7 +116,8 @@ export default angular.module(name, dependencies)
         controller: ConditionEditor,
         controllerAs: '$ctrl',
         bindings: {
-            'condition': '<'
+            'condition': '<',
+            'schema': '<'
         }
     })
     .config(config);

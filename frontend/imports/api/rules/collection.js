@@ -16,18 +16,18 @@ if(Meteor.isServer) {
 
 export const COMPARISON_OPS = ['=', '!=', '<', '<=', '>=', '>'];
 
-export const CriteriaSchema = new SimpleSchema({
+export const ConditionSchema = new SimpleSchema({
     _id: {
         type: String,
         optional: true
     },
-    LHS: {
+    fieldName: {
         type: String,
-        label: "Left Hand Side"
+        label: "Field Name"
     },
-    RHS: {
+    compValue: {
         type: String,
-        label: "Right Hand Side"
+        label: "Comparison Value"
     },
     compOp: {
         type: String,
@@ -56,13 +56,13 @@ export const RuleSchema = new SimpleSchema({
         type: String,
         label: "Referenced FileSchema ID"
     },
-    criteria: {
-        type: [CriteriaSchema],
+    conditions: {
+        type: [ConditionSchema],
         defaultValue: []
     }
 });
 
-RuleSchema.helpers({
+Rules.helpers({
     FileSchema() {
         return FileSchemas.findOne(this.fileSchemaId);
     }

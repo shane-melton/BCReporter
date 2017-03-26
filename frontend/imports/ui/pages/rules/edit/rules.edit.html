@@ -7,20 +7,21 @@
                     <div layout="row">
                         <md-input-container flex>
                             <label>Rule Name</label>
-                            <input type="text" ng-model="$ctrl.search.text" required>
+                            <input type="text" ng-model="$ctrl.ruleObject.name" required>
                         </md-input-container>
                     </div>
                     <div layout="row">
                         <md-input-container flex class="md-block">
                             <label>Description</label>
-                            <textarea ng-model="user.biography" md-maxlength="150" rows="2" md-select-on-focus></textarea>
+                            <textarea ng-model="$ctrl.ruleObject.description" md-maxlength="150" rows="2" md-select-on-focus></textarea>
                         </md-input-container>
                     </div>
                     <div layout="row">
                         <md-input-container flex>
                             <label>File Schema</label>
-                            <md-select ng-model="$ctrl.fileSchema" required ng-disabled="$ctrl.hasConditions()">
-                                <md-option ng-repeat="schema in $ctrl.fileSchemas" ng-value="schema.name">
+                            <md-select id="schemaSelector" ng-model="$ctrl.ruleObject.fileSchemaId" required ng-disabled="$ctrl.hasConditions()">
+                                <md-option disabled>Select a schema</md-option>
+                                <md-option ng-repeat="schema in $ctrl.fileSchemas" ng-value="schema._id">
                                     {{schema.name}}
                                 </md-option>
                             </md-select>
@@ -30,7 +31,7 @@
                 </md-card-content>
                 <md-card-actions layout="row" layout-align="end center">
                     <md-button>Clear</md-button>
-                    <md-button class="md-accent md-raised">Save Rule</md-button>
+                    <md-button class="md-accent md-raised" ng-click="$ctrl.saveRule()">Save Rule</md-button>
                 </md-card-actions>
             </md-card>
         </div>
@@ -39,12 +40,12 @@
                 <md-card-content>
                     <h2>Rule Conditions</h2>
                     <md-list>
-                        <md-list-item flex class="md-no-proxy" ng-repeat="cond in $ctrl.conditions">
+                        <md-list-item flex class="md-no-proxy" ng-repeat="cond in $ctrl.ruleObject.conditions">
                             <div layout="row" layout-align="start center" flex>
                                 <div flex="5">
                                     <md-checkbox aria-label="Select Condition" ng-model="cond.checked" style="margin-bottom: 0;"></md-checkbox>
                                 </div>
-                                <condition-editor condition="cond" flex></condition-editor>
+                                <condition-editor schema="$ctrl.getFileSchema()" condition="cond" flex></condition-editor>
                             </div>
 
                         </md-list-item>
