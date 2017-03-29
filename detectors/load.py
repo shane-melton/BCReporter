@@ -1,19 +1,10 @@
-# TODO: Replace with better import once hyphens are replaced with underscores
-input_system = __import__('input-system-api.input_system', fromlist=['input_system'])
-Database = input_system.Database
+import pymongo
+from pymongo import MongoClient
 
 from detectors.rule_based_fraud_detector import RuleBasedFraudDetector
 
 
-# FOR TESTING PURPOSES ONLY -- REMOVE WHEN A DATABASE IS AVAILABLE
-Database.__init__ = lambda *args: None
-Database.connect = lambda *args: None
-
-
-def load_rule(rule_id):
-    # STUB
-    return None
-
+def load_rule(rule_id, mongo_host=None, mongo_port=None):
     """
     Copy the rule found at rule_id in the rules table of the system DB to the analytics DB.
 
@@ -26,62 +17,47 @@ def load_rule(rule_id):
         ids of new rule violations in the notifications table of the system DB.
     """
 
-    data_db = Database('', '', '', '')
-    system_db = Database('', '', '', '')
-    analytics_db = Database('', '', '', '')
+    client = MongoClient(mongo_host, mongo_port)
 
-    data_db.connect()
-    system_db.connect()
-    analytics_db.connect()
+    system_db = client.system_db
+    analytics_db = client.analytics_db
 
-    [rule, *extra] = system_db.select('rules', lhs='id', rhs=rule_id)
-    if len(extra) > 0:
-        print("Warning: Rule selection returned multiple rules. Only copying the first one found.")
+    rule = system_db.rules.find_one({'_id':rule_id})
+    analytics_db.rules.insert_one(rule)
 
-    # TODO: the analytics_db will be a nosql database
-    # TODO: Get columns and values from rule
-    analytics_db.insert('rules', columns=[], values=[])
+    return None
 
 
-def load_applications(app_table_id):
-    # STUB
-    return []
-
+def load_applications(app_table_id, mongo_host=None, mongo_port=None):
     """
-    Copy the rules found in the table with app_table_id in the data DB into the analytics DB, and
-    then run all existing rules (that have compatible schema) against the new applications, storing
-    any violatins in the notifications table of the system DB.
+    Copy the applications found in the table with app_table_id in the data DB into the analytics DB,
+    and then run all existing rules (that have compatible schema) against the new applications,
+    storing any violatins in the notifications table of the system DB.
 
-    param: app_table_id, int, unique identifier of the new table.
-    return: ids of new violations, list of ints,
+    param: app_table_id, string, unique identifier of the new table.
+    return: ids of new violations, list of ObjectId,
         ids of new rule violations in the notifications table of the system DB.
     """
 
-    data_db = Database('', '', '', '')
-    system_db = Database('', '', '', '')
-    analytics_db = Database('', '', '', '')
+    client = MongoClient(mongo_host, mongo_port)
 
-    data_db.connect()
-    system_db.connect()
-    analytics_db.connect()
+    data_db = client.data_db
+    system_db = client.system_db
+    analytics_db = client.analytics_db
 
-    # Select all rows from applications table
-    applications = data_db.select('applications')
+    # Copy over the new applications
+    applications = list(data_db[app_table_id].find())
+    analytics_db.applications.insert_many(applications)
 
-    # TODO: Get columns and values from applications
-    analytics_db.insert('applications', columns=[], values=[])
+    # Make detector with rules from analytics database
+    # TODO: Enable cross-app rules
+    rules = list(analytics_db.rules.find())
+    detector = RuleBasedFraudDetector(single_app_rules=rules, cross_app_rules=None)
 
-    # TODO: Get rules from analytics_db
-    detector = RuleBasedFraudDetector(single_app_rules={}, cross_app_rules={})
+    # Run all rules against the new applications
+    violations = detector.apply_rules(apps=applications)
 
-    # TODO: Get apps from applications
-    violations = detector.apply_rules(apps=[])
-
-    # TODO: Put violations in notifications table of system_db
-    # TODO: Get ids of violations as we send them
-    violation_ids = []
-    for v in violations:
-        system_db.insert('notifications', columns=[], values=[])
-
-    return violation_ids
+    # Put violations in notifications table of system_db
+    violations_insert_result = system_db.notifications.insert_many(violations)
+    return violation_insert_result.inserted_ids
 
