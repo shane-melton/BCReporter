@@ -15,7 +15,8 @@ export default class ListController {
         $reactive(this).attach($scope);
 
         this.subscribe('fileSchemas', () => [{
-            viewName: "list"
+            viewName: "list",
+            sort: {"name": 1}
         }]);
 
         this.helpers({

@@ -3,6 +3,7 @@
  */
 
 import {FileSchemas} from '../../../../api/fileSchemas';
+import {Rules} from '../../../../api/rules';
 
 export default class EditController {
 
@@ -31,6 +32,20 @@ export default class EditController {
         this.ruleObject = {
             conditions: []
         };
+
+        if(!_.isNull($stateParams.id)) {
+            this.subscribe('rules', () => [{
+                viewName: "edit",
+                id: $stateParams.id
+            }], {
+                onReady: () => {
+                    this.ruleObject = Rules.findOne($stateParams.id);
+                    if(_.isUndefined(this.ruleObject.conditions)) {
+                        this.ruleObject.conditions = [];
+                    }
+                }
+            });
+        }
 
     }
 

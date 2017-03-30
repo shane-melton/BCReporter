@@ -14,6 +14,31 @@ export function createRule(ruleObject) {
 
 }
 
+export function removeRule(ruleId) {
+
+    check(ruleId, String);
+
+    Rules.remove(ruleId);
+
+}
+
+export function saveRule(ruleId, ruleObject) {
+
+    RuleSchema.clean(ruleObject);
+
+    check(ruleId, String);
+    check(ruleObject, RuleSchema);
+
+    Rules.update(ruleId, {$set: {
+        name: ruleObject.name,
+        description: ruleObject.description,
+        fileSchemaId: ruleObject.fileSchemaId,
+        conditions: ruleObject.conditions
+    }});
+
+}
+
 Meteor.methods({
-    createRule
+    createRule,
+    saveRule
 });
