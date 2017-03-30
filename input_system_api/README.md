@@ -27,7 +27,7 @@ Each document will, in addition to the data from the file itself, have a "file_n
 
 Endpoint: `POST /post_file`
 
-It is expected that A '''javascript <form>''' tag is marked with enctype=multipart/form-data and an <input type=file> is placed in that form.
+It is expected that A `<form>` tag is marked with enctype=multipart/form-data and an `<input type=file>` is placed in that form.
 
 Body Parameters:
 ```javascript
