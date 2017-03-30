@@ -3,8 +3,7 @@ import json
 from collections import OrderedDict
 import sys
 from pymongo import MongoClient
-from ..detectors.load import *
-
+from detectors.load import *
 app = Flask(__name__)
 mong_client_system = MongoClient('localhost', 3001)
 mong_client_data = MongoClient('localhost', 5001)
@@ -42,7 +41,7 @@ def upload_file_to_db(file, filename, schema):
         cur_upload["filename"] = filename
         for i in range(len(cols)):
             val = row[i]
-            if schema[cols[i]]["secure"] is True:
+            #if schema[cols[i]]["secure"] is True:
                 # encrypt val
             cur_upload[cols[i]] = val
         cur_collection.insert(cur_upload)
