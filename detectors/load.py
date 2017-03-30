@@ -79,6 +79,7 @@ def load_applications(
     # Run all rules against the new applications
     detector = RuleBasedFraudDetector(single_app_rules=rules, cross_app_rules=None)
     violations = detector.apply_rules(apps=applications)
+    violations = [{'app_id':v['app_id'], 'rule_id':v['rule_id']} for v in violations]
 
     # Put violations in notifications table of system_db
     requests.post('http://localhost:3000/api/notifications', data=violations)
