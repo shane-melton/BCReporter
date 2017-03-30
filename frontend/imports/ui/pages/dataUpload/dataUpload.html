@@ -1,0 +1,35 @@
+<div layout="row" layout-fill flex layout-align="center">
+    <md-content flex="100" layout="row" layout-align="center">
+        <div flex="100" flex-gt-xs="60" flex-gt-sm="50">
+            <!--<h2 class="md-title inset">D/h2>-->
+            <form>
+                <md-card>
+                    <md-card-title>
+                        <md-card-title-text>
+                            <span class="md-headline">Data Upload Form</span>
+                        </md-card-title-text>
+                    </md-card-title>
+                    <md-card-content layout="row">
+                        <md-input-container flex-gt-xs="50" flex>
+                            <label>File Schema</label>
+                            <md-select ng-model="upload.selectedSchema">
+                                <md-option ng-repeat="schema in upload.fileSchemas" ng-value="schema.name">
+                                    {{schema.name}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                        <!--<md-input-container lex-gt-xs="50" flex>-->
+                        <div flex-gt-sm="50" flex layout="row" layout-align="center center">
+                            <input class="ng-hide" id="input-file-id" type="file" file-input="upload.files" />
+                            <label flex for="input-file-id" class="md-button md-raised md-primary">Choose File</label>
+                        </div>
+                        <!--</md-input-container>-->
+                    </md-card-content>
+                    <md-card-actions layout="row" layout-align="end center">
+                        <md-button ng-click="upload.uploadFile()" class="md-accent md-raised">Upload</md-button>
+                    </md-card-actions>
+                </md-card>
+            </form>
+        </div>
+    </md-content>
+</div>
