@@ -8,7 +8,7 @@ from detectors.rule_based_fraud_detector import RuleBasedFraudDetector
 def load_rule(
         rule_id,
         system_uri='mongodb://127.0.0.1:3001/meteor',
-        analytics_uri=None,
+        analytics_uri=None):
     """
     Copy the rule found at rule_id in the rules table of the system DB to the analytics DB.
 
@@ -35,7 +35,7 @@ def load_applications(
         app_table_id,
         data_uri='mongodb://127.0.0.1:3001/datadb',
         system_uri='mongodb://127.0.0.1:3001/meteor',
-        analytics_uri=None,
+        analytics_uri=None):
     """
     Copy the applications found in the table with app_table_id in the data DB into the analytics DB,
     and then run all existing rules (that have compatible schema) against the new applications,
