@@ -68,7 +68,7 @@ def load_applications(
     rules = []
     for system_db_rule in system_db_rules:
         _id = system_db_rule['_id']
-        body = system_db_rule['conditions']
+        body = system_db_rule['conditions'][0] # I assume only one condition per rule
         rule = {
             '_id': _id,
             'condition': body['compOp'],

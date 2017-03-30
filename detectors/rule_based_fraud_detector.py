@@ -55,14 +55,16 @@ class RuleBasedFraudDetector:
         return cls._get_operators()[condition](lhs, rhs)
 
     def _apply_single_app_rule(self, column, condition, value, app):
-        if not self._satisfies_condition(condition, app[column], value):
+        #if not self._satisfies_condition(condition, app[column], value):
+        if self._satisfies_condition(condition, app[column], value):
             return (condition, column, value)
         return None
 
     def _apply_cross_app_rule(self, aggregation, column, condition, value, apps, **kwargs):
         satisfies = self._satisfies_condition(
             condition, self._get_aggregations()[aggregation](column, kwargs['key'], apps), value)
-        if not satisfies:
+        #if not satisfies:
+        if satisfies:
             return (condition, aggregation, kwargs['key'], column, value)
         return None
 
