@@ -30,14 +30,14 @@ def index():
 @cross_origin()
 def test():
     file = request.files['file']
-    schema_id = request.form["schema_name"]
+    schema_id = request.form["schema_id"]
     raw = csv.reader(file, delimiter=',')
     schema = get_file_schema(schema_id)
     return upload_file_to_db(raw, file.filename, schema)
 
 def get_file_schema(schema_id):
     file_schemas = sys_db.fileSchemas
-    schema = file_schemas.find_one({"name": schema_id})
+    schema = file_schemas.find_one({"_id": schema_id})
     if schema:
         return schema
     else:
@@ -62,13 +62,15 @@ def upload_file_to_db(file, filename, schema):
                 # encrypt val
             cur_upload[cols[i]] = val
         cur_collection.insert(cur_upload)
-    # load_applications(schema["name"])
+    # load_applications(schema["name"], filename)
     return "no problem"
 
 @app.route('/rule_schema/', methods=['POST'])
 def new_rule_schema():
     body = request.get_json()
-    rule_schema_id = body["rule_name"]
+    rule_schema_id = body["rule_id"]
+    # load_rule(rule_id)
+    
 
 
 
