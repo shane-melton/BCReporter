@@ -5,7 +5,7 @@ from collections import OrderedDict
 import sys
 from pymongo import MongoClient
 import csv
-from ..detectors.load import *
+from detectors.load import *
 
 app = Flask(__name__)
 CORS(app)
