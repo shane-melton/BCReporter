@@ -35,8 +35,33 @@ export function removeSchema(schemaId) {
 
 }
 
+
+export function uploadData(formData) {
+
+    check(formData, Object);
+
+    if(Meteor.isServer) {
+
+    let url = "http://localhost:5000/post_file";
+
+    console.log("data", formData);
+
+
+        // HTTP.call('POST', url, {
+        //     data: formData,
+        //     // headers: {
+        //     //     'content-type': undefined
+        //     // }
+        // }, (data) => {
+        //     console.log(data);
+        // });
+    }
+
+}
+
 Meteor.methods({
     saveSchema,
     createSchema,
-    removeSchema
+    removeSchema,
+    uploadData
 });

@@ -6,7 +6,7 @@ import {Rules} from '../../../../api/rules';
 
 export default class ListController {
 
-    constructor($reactive, $scope, $state, $mdDialog, $mdSidenav) {
+    constructor($reactive, $scope, $state, $mdDialog, $mdSidenav, $Notifications) {
         'ngInject';
 
         this.$state = $state;
@@ -24,6 +24,9 @@ export default class ListController {
                 return Rules.find({});
             }
         });
+
+
+        this.$Notifications = $Notifications;
 
         this.search = {
             text: "",

@@ -28,11 +28,14 @@ import 'angular-material-data-table/dist/md-data-table.min.css';
 import {name as UserDashboard} from '../imports/ui/pages/userDashboard/userDashboard';
 import {name as FileSchemas} from '../imports/ui/pages/fileSchemas/fileSchemas';
 import {name as Rules} from '../imports/ui/pages/rules/rules';
+import {name as DataUpload} from '../imports/ui/pages/dataUpload/dataUpload';
 
 //Components
 import {name as Navigation} from '../imports/ui/components/navigation/navigation';
 
 //Services
+
+import {name as Notifications} from '../imports/ui/services/notification/notification';
 
 //API
 
@@ -41,8 +44,9 @@ import './main.scss';
 let appName = "bcreporter";
 
 let dependencies = [appName, angularMeteor, ngMaterial, ngAnimate, ngAria, uiRouter, 'md.data.table',
-                    UserDashboard, FileSchemas, Rules,
-                    Navigation];
+                    UserDashboard, FileSchemas, Rules, DataUpload,
+                    Navigation,
+                    Notifications];
 
 function config($locationProvider, $urlRouterProvider) {
     'ngInject';
@@ -53,8 +57,9 @@ function config($locationProvider, $urlRouterProvider) {
 
 }
 
-function run() {
+function run($Notifications) {
     'ngInject';
+
 
 
 
