@@ -1,0 +1,35 @@
+<div layout="row" layout-align="start center" flex>
+
+    <!--Field Selector-->
+    <md-input-container flex="30">
+        <label>Field Name</label>
+        <md-select ng-model="$ctrl.condition.fieldName" ng-change="$ctrl.fieldChange()" required>
+            <md-option ng-repeat="field in $ctrl.schema.columns" ng-value="field.name">{{field.name}}</md-option>
+        </md-select>
+    </md-input-container>
+
+    <span style="margin: 0 5px">&nbsp;is&nbsp;</span>
+
+    <!--Boolean Field-->
+    <md-input-container ng-if="$ctrl.isBoolean()" flex="30">
+        <label>Value</label>
+        <md-select ng-model="$ctrl.condition.compValue" required>
+            <md-option ng-value="true">True</md-option>
+            <md-option ng-value="false">False</md-option>
+        </md-select>
+    </md-input-container>
+
+    <!--Comparison Field-->
+    <md-input-container flex="30" ng-if="!$ctrl.isBoolean()">
+        <label>Comparison</label>
+        <md-select ng-model="$ctrl.condition.compOp" required>
+            <md-option ng-repeat="comp in $ctrl.comparisons" ng-value="comp.val">{{comp.desc}}</md-option>
+        </md-select>
+    </md-input-container>
+
+    <md-input-container flex ng-if="!$ctrl.isBoolean()">
+        <label>Value</label>
+        <input type="text" ng-model="$ctrl.condition.compValue" required>
+    </md-input-container>
+
+</div>

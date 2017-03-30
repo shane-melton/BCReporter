@@ -1,0 +1,64 @@
+<div layout="row" layout-align="center">
+    <div flex-gt-md="80" flex="100" layout="row" layout-sm="column" layout-xs="column">
+        <div flex-sm flex-xs flex-gt-sm="30">
+            <md-card flex>
+                <md-card-content>
+                    <h2>Rule Details</h2>
+                    <div layout="row">
+                        <md-input-container flex>
+                            <label>Rule Name</label>
+                            <input type="text" ng-model="$ctrl.ruleObject.name" required>
+                        </md-input-container>
+                    </div>
+                    <div layout="row">
+                        <md-input-container flex class="md-block">
+                            <label>Description</label>
+                            <textarea ng-model="$ctrl.ruleObject.description" md-maxlength="150" rows="2" md-select-on-focus></textarea>
+                        </md-input-container>
+                    </div>
+                    <div layout="row">
+                        <md-input-container flex>
+                            <label>File Schema</label>
+                            <md-select id="schemaSelector" ng-model="$ctrl.ruleObject.fileSchemaId" required ng-disabled="$ctrl.hasConditions()">
+                                <md-option disabled>Select a schema</md-option>
+                                <md-option ng-repeat="schema in $ctrl.fileSchemas" ng-value="schema._id">
+                                    {{schema.name}}
+                                </md-option>
+                            </md-select>
+                            <md-tooltip md-direction="top" ng-if="$ctrl.hasConditions()">Rule conditions must be cleared!</md-tooltip>
+                        </md-input-container>
+                    </div>
+                </md-card-content>
+                <md-card-actions layout="row" layout-align="end center">
+                    <md-button ui-sref="rules.list">Cancel</md-button>
+                    <md-button class="md-accent md-raised" ng-click="$ctrl.saveRule()">Save Rule</md-button>
+                </md-card-actions>
+            </md-card>
+        </div>
+        <div flex>
+            <md-card flex>
+                <md-card-content>
+                    <h2>Rule Conditions</h2>
+                    <md-list>
+                        <md-list-item flex class="md-no-proxy" ng-repeat="cond in $ctrl.ruleObject.conditions">
+                            <div layout="row" layout-align="start center" flex>
+                                <div flex="5">
+                                    <md-checkbox aria-label="Select Condition" ng-model="cond.checked" style="margin-bottom: 0;"></md-checkbox>
+                                </div>
+                                <condition-editor schema="$ctrl.getFileSchema()" condition="cond" flex></condition-editor>
+                            </div>
+
+                        </md-list-item>
+                    </md-list>
+                </md-card-content>
+                <md-card-actions layout="row" layout-align="end center">
+                    <md-button ng-click="$ctrl.clearAll()" aria-label="Clear All">Clear All</md-button>
+                    <md-button ng-click="$ctrl.deleteSelected()" aria-label="Delete Selected">Delete Selected</md-button>
+                    <md-button class="md-primary" aria-label="Add Condition" ng-click="$ctrl.addCondition()">
+                        Add Condition
+                    </md-button>
+                </md-card-actions>
+            </md-card>
+        </div>
+    </div>
+</div>
