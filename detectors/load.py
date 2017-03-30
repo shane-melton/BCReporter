@@ -1,10 +1,14 @@
 import pymongo
 from pymongo import MongoClient
+import requests
 
 from detectors.rule_based_fraud_detector import RuleBasedFraudDetector
 
 
-def load_rule(rule_id, mongo_host=None, mongo_port=None):
+def load_rule(
+        rule_id,
+        system_uri='mongodb://127.0.0.1:3001/meteor',
+        analytics_uri=None,
     """
     Copy the rule found at rule_id in the rules table of the system DB to the analytics DB.
 
@@ -13,51 +17,57 @@ def load_rule(rule_id, mongo_host=None, mongo_port=None):
         table of the system DB.
 
     param: rule_id, int, unique identifier of the new rule.
-    return: ids of new violations, list of ints (or None),
-        ids of new rule violations in the notifications table of the system DB.
+    param: system_uri, str, uri of system db
+    param: analytics_uri, str, uri of analytics db
+    return: None
     """
 
-    client = MongoClient(mongo_host, mongo_port)
-
-    system_db = client.system_db
-    analytics_db = client.analytics_db
-
+    system_db = MongoClient(system_uri).system_db
     rule = system_db.rules.find_one({'_id':rule_id})
-    analytics_db.rules.insert_one(rule)
 
-    return None
+    # TODO: Remove check once analytics db exists
+    if analytics_uri is not None:
+        analytics_db = MongoClient(analytics_uri).analytics_db
+        analytics_db.rules.insert_one(rule)
 
 
-def load_applications(app_table_id, mongo_host=None, mongo_port=None):
+def load_applications(
+        app_table_id,
+        data_uri='mongodb://127.0.0.1:3001/datadb',
+        system_uri='mongodb://127.0.0.1:3001/meteor',
+        analytics_uri=None,
     """
     Copy the applications found in the table with app_table_id in the data DB into the analytics DB,
     and then run all existing rules (that have compatible schema) against the new applications,
     storing any violatins in the notifications table of the system DB.
 
-    param: app_table_id, string, unique identifier of the new table.
-    return: ids of new violations, list of ObjectId,
-        ids of new rule violations in the notifications table of the system DB.
+    param: app_table_id, str, unique identifier of the new table.
+    param: data_uri, str, uri of data db
+    param: system_uri, str, uri of system db
+    param: analytics_uri, str, uri of analytics db
+    return: None
     """
 
-    client = MongoClient(mongo_host, mongo_port)
+    # TODO: Remove check once analytics db exists
+    if analytics_uri is not None:
+        analytics_db = MongoClient(analytics_uri).analytics_db
 
-    data_db = client.data_db
-    system_db = client.system_db
-    analytics_db = client.analytics_db
+        # Copy over the new applications
+        data_db = MongoClient(data_uri).data_db
+        applications = list(data_db[app_table_id].find())
+        analytics_db.applications.insert_many(applications)
 
-    # Copy over the new applications
-    applications = list(data_db[app_table_id].find())
-    analytics_db.applications.insert_many(applications)
-
-    # Make detector with rules from analytics database
-    # TODO: Enable cross-app rules
-    rules = list(analytics_db.rules.find())
+        # Make detector with rules from analytics database
+        # TODO: Enable cross-app rules
+        rules = list(analytics_db.rules.find())
+    else:
+        system_db = MongoClient(system_uri).system_db
+        rules = list(system_db.rules.find())
     detector = RuleBasedFraudDetector(single_app_rules=rules, cross_app_rules=None)
 
     # Run all rules against the new applications
     violations = detector.apply_rules(apps=applications)
 
     # Put violations in notifications table of system_db
-    violations_insert_result = system_db.notifications.insert_many(violations)
-    return violation_insert_result.inserted_ids
+    requests.post('http://localhost:3000/api/notifications', data=violations)
 
