@@ -4,7 +4,8 @@
 
 Run the following commands
 
-```./flask/scripts/python.exe app.py
+```bash
+  ./flask/scripts/python.exe app.py
 ```
 
 After the command the application should be accessible from [localhost:5000](http://localhost:5000).
