@@ -1,0 +1,85 @@
+<md-content layout-padding layout-align-gt-xs="center start" layout-gt-xs="row">
+    <div flex-gt-xs="80">
+        <form name="newSchemaForm">
+            <div layout="row" layout-align="start center" layout-wrap>
+                <h2 flex="noshrink">{{$ctrl.formTitle}}</h2>
+                <div flex></div>
+                <div flex="noshrink" layout="row">
+                    <md-button ui-sref="fileSchemas.list" flex="noshrink">
+                        Cancel
+                    </md-button>
+                    <md-button type="submit" ng-click="$ctrl.save()" class="md-accent md-raised" flex="noshrink">
+                        Save
+                    </md-button>
+                </div>
+            </div>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Delectus eaque officiis, quod sint veritatis voluptas.</p>
+            <md-whiteframe class="md-whiteframe-1dp">
+
+                    <div layout-gt-xs="row" layout-wrap class="">
+                        <md-input-container class="md-block" flex-gt-xs="40">
+                            <label for="schemaName">Schema Name</label>
+                            <input type="text" required id="schemaName" ng-model="$ctrl.schema.name">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex-gt-xs="60">
+                            <label for="description">Schema Description</label>
+                            <input type="text" name="description" ng-model="$ctrl.schema.description">
+                        </md-input-container>
+                        <div flex-gt-xs="80"></div>
+
+                    </div>
+
+                    <md-toolbar class="md-table-toolbar">
+                        <div class="md-toolbar-tools">
+                            <span>Schema Columns</span>
+                            <div flex></div>
+                            <md-button ng-click="$ctrl.addColumn()" class="md-icon-button">
+                                <md-icon md-font-library="material-icons"  aria-label="Add Column">add</md-icon>
+                                <md-tooltip md-direction="top">Add Column</md-tooltip>
+                            </md-button>
+                            <md-button ng-click="$ctrl.deleteSelected()" class="md-icon-button">
+                                <md-icon md-font-library="material-icons" aria-label="Delete Selected">delete</md-icon>
+                                <md-tooltip md-direction="top">Delete Selected</md-tooltip>
+                            </md-button>
+                        </div>
+                    </md-toolbar>
+
+                    <md-table-container>
+                        <table md-table md-row-select multiple="true" ng-model="$ctrl.selected">
+                            <thead md-head>
+                            <tr md-row>
+                                <th md-column><h3>Column Name</h3></th>
+                                <th md-column><h3>Type</h3></th>
+                                <th class="center" md-column hide show-gt-xs><h3>Unique?</h3></th>
+                                <th class="center" md-column hide show-gt-xs><h3>Secure?</h3></th>
+                                <th class="center" md-column hide-gt-xs><h3>Options</h3></th>
+                            </tr>
+                            </thead>
+                            <tbody md-body>
+                            <tr md-row md-select="item" md-select-id="id" ng-repeat="item in $ctrl.schema.columns">
+                                <td md-cell ng-click="$ctrl.editColumnName($event, item)">
+                                    <span>{{item.name || "Click to edit..."}}</span>
+                                    <md-icon md-font-library="material-icons" style="font-size:13px; padding-left: 10px; padding-top: 8px;" aria-label="Edit">edit</md-icon>
+                                </td>
+                                <td md-cell><md-select ng-model="item.type" placeholder="Select a type">
+                                    <md-option ng-value="type" ng-repeat="type in $ctrl.types">{{type}}</md-option>
+                                </md-select></td>
+                                <td class="center" md-cell hide show-gt-xs>
+                                    <md-checkbox aria-label="Is Unique?" ng-model="item.unique"></md-checkbox>
+                                </td>
+                                <td class="center" md-cell hide show-gt-xs>
+                                    <md-checkbox aria-label="Is Secure?" ng-model="item.secure"></md-checkbox>
+                                </td>
+                                <td class="center" md-cell hide-gt-xs>
+                                    <md-button class="md-icon-button">
+                                        <md-icon md-font-library="material-icons">more_horiz</md-icon>
+                                    </md-button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </md-table-container>
+            </md-whiteframe>
+        </form>
+    </div>
+</md-content>
