@@ -15,22 +15,25 @@ class RuleBasedFraudDetector:
             'app_ids', 'rule_id', 'condition', 'aggregation', 'key', 'column', 'value']
 
         for rule in self._single_app_rules:
+            my_id = rule['_id']
+            rule = dict([(k,v) for k,v in rule.items() if k != '_id'])
             for app in apps:
                 result = self._apply_single_app_rule(**rule, app=app)
                 if result:
                     violation = dict(list(zip(
                         single_app_violation_keys,
-                        (app['_id'], rule['_id']) + result)))
+                        (app['_id'], my_id) + result)))
                     single_app_violations.append(violation)
-
-        for rule in self._cross_app_rules:
-            result = self._apply_cross_app_rule(**rule, apps=apps)
-            if result:
-                app_ids = [app['_id'] for app in apps]
-                violation = dict(list(zip(
-                    cross_app_violation_keys,
-                    (app_ids, rule['_id']) + result)))
-                cross_app_violations.append(violation)
+        
+        if self._cross_app_rules is not None:
+            for rule in self._cross_app_rules:
+                result = self._apply_cross_app_rule(**rule, apps=apps)
+                if result:
+                    app_ids = [app['_id'] for app in apps]
+                    violation = dict(list(zip(
+                        cross_app_violation_keys,
+                        (app_ids, rule['_id']) + result)))
+                    cross_app_violations.append(violation)
 
         return (single_app_violations, cross_app_violations)
 
@@ -67,4 +70,3 @@ class RuleBasedFraudDetector:
         if satisfies:
             return (condition, aggregation, kwargs['key'], column, value)
         return None
-

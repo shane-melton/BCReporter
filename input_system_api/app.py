@@ -6,6 +6,7 @@ import sys
 from pymongo import MongoClient
 import csv
 from detectors.load import *
+from io import TextIOWrapper
 
 app = Flask(__name__)
 CORS(app)
@@ -30,14 +31,18 @@ def index():
 @cross_origin()
 def test():
     file = request.files['file']
-    schema_id = request.form["schema_id"]
+    filename = file.filename
+
+    file = TextIOWrapper(file, encoding='utf-8')
+
+    schema_id = request.form["schema_name"]
     raw = csv.reader(file, delimiter=',')
     schema = get_file_schema(schema_id)
-    return upload_file_to_db(raw, file.filename, schema)
+    return upload_file_to_db(raw, filename, schema)
 
 def get_file_schema(schema_id):
     file_schemas = sys_db.fileSchemas
-    schema = file_schemas.find_one({"_id": schema_id})
+    schema = file_schemas.find_one({"name": schema_id})
     if schema:
         return schema
     else:
@@ -45,10 +50,15 @@ def get_file_schema(schema_id):
 
 
 def upload_file_to_db(file, filename, schema):
+    # print(schema)
     cur_collection = data_db[schema['name']]
     cols = next(file)
-    print cols
+
     schema_cols = [d['name'] for d in schema['columns']]
+
+    print(schema_cols)
+    print(cols)
+
     for val in cols:
         if val not in schema_cols:
             return "problem"
@@ -62,7 +72,7 @@ def upload_file_to_db(file, filename, schema):
                 # encrypt val
             cur_upload[cols[i]] = val
         cur_collection.insert(cur_upload)
-    # load_applications(schema["name"], filename)
+    load_applications(schema["name"], filename)
     return "no problem"
 
 @app.route('/rule_schema/', methods=['POST'])

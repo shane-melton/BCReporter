@@ -1,0 +1,4 @@
+id,firstName,lastName,ssn,isSingle
+123,John,Doe,123-456-7890,true
+145,Sam,Smith,321-543-4840,false
+156,Jane,Spencer,163-253-1920,true

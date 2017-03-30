@@ -49,7 +49,7 @@ def load_applications(
     return: None
     """
 
-    data_db = MongoClient(data_uri).datadb
+    data_db = MongoClient(data_uri).data
     applications = list(data_db[data_collection_name].find({'filename': data_id}))
 
     # TODO: Remove check once analytics db exists
@@ -81,8 +81,8 @@ def load_applications(
     # Run all rules against the new applications
     detector = RuleBasedFraudDetector(single_app_rules=rules, cross_app_rules=None)
     violations = detector.apply_rules(apps=applications)
-    violations = [{'app_id':v['app_id'], 'rule_id':v['rule_id']} for v in violations]
+    violations = [{'app_id':v['app_id'], 'rule_id':v['rule_id']} for v in violations[0]]
 
     # Put violations in notifications table of system_db
-    requests.post('http://localhost:3000/api/notifications', data=violations)
+    requests.post('http://localhost:3000/api/notifications', data=violations[0])
 
