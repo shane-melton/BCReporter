@@ -10,14 +10,27 @@ class RuleBasedFraudDetector:
         single_app_violations = []
         cross_app_violations = []
 
+        single_app_violation_keys = ['app_id', 'rule_id', 'condition', 'column', 'value']
+        cross_app_violation_keys = [
+            'app_ids', 'rule_id', 'condition', 'aggregation', 'key', 'column', 'value']
+
         for rule in self._single_app_rules:
-            for app in enumerate(apps):
-                result = self._apply_single_app_rule(**rule, app=app[1])
-                if result: single_app_violations.append((app[0],) + result)
+            for app in apps:
+                result = self._apply_single_app_rule(**rule, app=app)
+                if result:
+                    violation = dict(list(zip(
+                        single_app_violation_keys,
+                        (app['_id'], rule['_id']) + result)))
+                    single_app_violations.append(violation)
 
         for rule in self._cross_app_rules:
             result = self._apply_cross_app_rule(**rule, apps=apps)
-            if result: cross_app_violations.append(result)
+            if result:
+                app_ids = [app['_id'] for app in apps]
+                violation = dict(list(zip(
+                    cross_app_violation_keys,
+                    (app_ids, rule['_id']) + result)))
+                cross_app_violations.append(violation)
 
         return (single_app_violations, cross_app_violations)
 
