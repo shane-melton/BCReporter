@@ -127,6 +127,7 @@ The FileSchemas collection is called `rules` and it has the following structure 
 #### Post
 
 Endpoint: `POST /api/notifications`
+
 Body Parameters:
 ```javascript
 {
