@@ -22,7 +22,7 @@ def load_rule(
     return: None
     """
 
-    system_db = MongoClient(system_uri).system_db
+    system_db = MongoClient(system_uri).meteor
     rule = system_db.rules.find_one({'_id':rule_id})
 
     # TODO: Remove check once analytics db exists
@@ -53,19 +53,31 @@ def load_applications(
         analytics_db = MongoClient(analytics_uri).analytics_db
 
         # Copy over the new applications
-        data_db = MongoClient(data_uri).data_db
+        data_db = MongoClient(data_uri).datadb
         applications = list(data_db[app_table_id].find())
         analytics_db.applications.insert_many(applications)
 
         # Make detector with rules from analytics database
         # TODO: Enable cross-app rules
-        rules = list(analytics_db.rules.find())
+        system_db_rules = list(analytics_db.rules.find())
     else:
-        system_db = MongoClient(system_uri).system_db
-        rules = list(system_db.rules.find())
-    detector = RuleBasedFraudDetector(single_app_rules=rules, cross_app_rules=None)
+        system_db = MongoClient(system_uri).meteor
+        system_db_rules = list(system_db.rules.find())
+
+    # Convert rules from system db format to format expected by detector
+    rules = []
+    for system_db_rule in system_db_rules:
+        _id = system_db_rule['_id']
+        body = system_db_rule['conditions']
+        rule = {
+            '_id': _id,
+            'condition': body['compOp'],
+            'column': body['fieldName'],
+            'value': body['compValue']}
+        rules.append(rule)
 
     # Run all rules against the new applications
+    detector = RuleBasedFraudDetector(single_app_rules=rules, cross_app_rules=None)
     violations = detector.apply_rules(apps=applications)
 
     # Put violations in notifications table of system_db
