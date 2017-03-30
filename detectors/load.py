@@ -32,7 +32,8 @@ def load_rule(
 
 
 def load_applications(
-        app_table_id,
+        data_collection_name,
+        data_id,
         data_uri='mongodb://127.0.0.1:3001/datadb',
         system_uri='mongodb://127.0.0.1:3001/meteor',
         analytics_uri=None):
@@ -48,13 +49,14 @@ def load_applications(
     return: None
     """
 
+    data_db = MongoClient(data_uri).datadb
+    applications = list(data_db[data_collection_name].find({'filename': data_id}))
+
     # TODO: Remove check once analytics db exists
     if analytics_uri is not None:
         analytics_db = MongoClient(analytics_uri).analytics_db
 
         # Copy over the new applications
-        data_db = MongoClient(data_uri).datadb
-        applications = list(data_db[app_table_id].find())
         analytics_db.applications.insert_many(applications)
 
         # Make detector with rules from analytics database
